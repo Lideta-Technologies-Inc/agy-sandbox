@@ -1,12 +1,14 @@
 # agy-sandbox
 
 <p align="center">
-  <img src="agy_sandbox/assets/agy-sandbox.svg" alt="agy-sandbox logo" width="180px" />
+  <img src="https://raw.githubusercontent.com/lideta-technologies/agy-sandbox/main/agy_sandbox/assets/agy-sandbox.svg" alt="agy-sandbox logo" width="380px" />
 </p>
+
+Secure, isolated development environments powered by Docker and the Antigravity AI agent.
 
 [![PyPI version](https://img.shields.io/pypi/v/agy-sandbox.svg)](https://pypi.org/project/agy-sandbox/)
 [![Python](https://img.shields.io/pypi/pyversions/agy-sandbox.svg)](https://pypi.org/project/agy-sandbox/)
-[![License: MIT](https://img.shields.io/pypi/l/agy-sandbox.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/pypi/l/agy-sandbox.svg)](https://github.com/lideta-technologies/agy-sandbox/blob/main/LICENSE)
 
 ---
 
