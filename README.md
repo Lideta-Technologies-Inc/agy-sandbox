@@ -1,7 +1,7 @@
 # agy-sandbox
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/lideta-technologies/agy-sandbox/main/agy_sandbox/assets/agy-sandbox.svg" alt="agy-sandbox logo" width="380px" />
+  <img src="agy_sandbox/assets/agy-sandbox.svg" alt="agy-sandbox logo" width="380px" />
 </p>
 
 Secure, isolated development environments powered by Docker and the Antigravity AI agent.
