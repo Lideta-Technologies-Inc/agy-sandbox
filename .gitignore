@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+*.tar.gz
+*.whl
+
+# Virtual environments
+.venv/
+venv/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Docker
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation (keep docs but allow updates)
+docs/
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/

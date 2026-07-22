@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agy-sandbox"
+version = "0.1.0"
+description = "Secure, isolated development environments powered by Docker and the Antigravity AI agent"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "ze@lideta.ai", email = "ze@lideta.ai"}
+]
+dependencies = [
+    "click>=8.1.0",
+    "docker>=7.0.0",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+]
+
+[project.scripts]
+agy-sandbox = "agy_sandbox.cli:main"
+
+[project.urls]
+"Homepage" = "https://github.com/lideta-technologies/agy-sandbox"
+"Repository" = "https://github.com/lideta-technologies/agy-sandbox"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["agy_sandbox*"]
+
+[tool.setuptools.package-data]
+agy_sandbox = ["assets/**/*"]
+
+[tool.setuptools]
+include-package-data = true

@@ -1,0 +1,67 @@
+FROM ubuntu:24.04
+
+# Aligned defaults to match your user account
+ARG USER_UID=1002
+ARG USER_GID=1002
+
+RUN apt-get update && apt-get install -y curl git gh sudo nodejs npm && rm -rf /var/lib/apt/lists/*
+
+# Dynamically handle user creation without touching or breaking UID 1000
+RUN if [ "$USER_UID" = "1000" ]; then \
+        echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers; \
+    else \
+        groupadd --gid $USER_GID developer && \
+        useradd --uid $USER_UID --gid $USER_GID -m -s /bin/bash developer && \
+        echo "developer ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers; \
+    fi
+
+# Create entrypoint to safely clone host auth and inject permissive sandbox settings
+RUN echo '#!/bin/bash' > /usr/local/bin/entrypoint.sh && \
+    echo 'USER_HOME=$(eval echo "~$USER")' >> /usr/local/bin/entrypoint.sh && \
+    echo 'LOCAL_GEMINI="$USER_HOME/.gemini"' >> /usr/local/bin/entrypoint.sh && \
+    echo 'HOST_GEMINI="$USER_HOME/.gemini_host"' >> /usr/local/bin/entrypoint.sh && \
+    echo 'mkdir -p "$LOCAL_GEMINI"' >> /usr/local/bin/entrypoint.sh && \
+    echo 'if [ -d "$HOST_GEMINI" ]; then' >> /usr/local/bin/entrypoint.sh && \
+    echo '    cp -R "$HOST_GEMINI"/. "$LOCAL_GEMINI/" 2>/dev/null' >> /usr/local/bin/entrypoint.sh && \
+    echo 'fi' >> /usr/local/bin/entrypoint.sh && \
+    echo 'mkdir -p "$LOCAL_GEMINI/antigravity-cli"' >> /usr/local/bin/entrypoint.sh && \
+    echo 'cat << "EOF" > "$LOCAL_GEMINI/antigravity-cli/settings.json"' >> /usr/local/bin/entrypoint.sh && \
+    echo '{' >> /usr/local/bin/entrypoint.sh && \
+    echo '  "colorScheme": "solarized light",' >> /usr/local/bin/entrypoint.sh && \
+    echo '  "enableTelemetry": false,' >> /usr/local/bin/entrypoint.sh && \
+    echo '  "gcp": {' >> /usr/local/bin/entrypoint.sh && \
+    echo '    "project": "lideta-products",' >> /usr/local/bin/entrypoint.sh && \
+    echo '    "location": "global"' >> /usr/local/bin/entrypoint.sh && \
+    echo '  },' >> /usr/local/bin/entrypoint.sh && \
+    echo '  "model": "Gemini 3.1 Pro (High)",' >> /usr/local/bin/entrypoint.sh && \
+    echo '  "toolPermission": "always-proceed",' >> /usr/local/bin/entrypoint.sh && \
+    echo '  "artifactReviewPolicy": "always-proceed",' >> /usr/local/bin/entrypoint.sh && \
+    echo '  "enableTerminalSandbox": false,' >> /usr/local/bin/entrypoint.sh && \
+    echo '  "allowNonWorkspaceAccess": true,' >> /usr/local/bin/entrypoint.sh && \
+    echo '  "permissions": {' >> /usr/local/bin/entrypoint.sh && \
+    echo '    "allow": [' >> /usr/local/bin/entrypoint.sh && \
+    echo '      "command(*)",' >> /usr/local/bin/entrypoint.sh && \
+    echo '      "write_file(*)",' >> /usr/local/bin/entrypoint.sh && \
+    echo '      "read_file(*)",' >> /usr/local/bin/entrypoint.sh && \
+    echo '      "read_url(*)",' >> /usr/local/bin/entrypoint.sh && \
+    echo '      "execute_url(*)",' >> /usr/local/bin/entrypoint.sh && \
+    echo '      "mcp(*)"' >> /usr/local/bin/entrypoint.sh && \
+    echo '    ]' >> /usr/local/bin/entrypoint.sh && \
+    echo '  }' >> /usr/local/bin/entrypoint.sh && \
+    echo '}' >> /usr/local/bin/entrypoint.sh && \
+    echo 'EOF' >> /usr/local/bin/entrypoint.sh && \
+    echo 'exec "$@"' >> /usr/local/bin/entrypoint.sh && \
+    chmod +x /usr/local/bin/entrypoint.sh
+
+USER ${USER_UID:-1002}
+WORKDIR /workspace
+
+RUN curl -fsSL https://antigravity.google/cli/install.sh | bash
+RUN curl -LsSf https://astral.sh/install.sh | sh
+
+# Enforce non-interactive runtime
+ENV ANTIGRAVITY_INTERACTIVE=false
+ENV PATH="/home/developer/.local/bin:/home/ubuntu/.local/bin:${PATH}"
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["bash"]

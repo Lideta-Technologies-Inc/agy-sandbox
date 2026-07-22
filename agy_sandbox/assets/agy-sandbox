@@ -1,0 +1,33 @@
+#!/bin/bash
+# agy-sandbox: Cross-platform wrapper script for the agy-sandbox Python package
+# This script provides backward compatibility with the original manage-agy.sh
+
+set -e
+
+# Find the agy-sandbox command (should be in PATH after installation)
+if command -v agy-sandbox &> /dev/null; then
+    AGY_CMD="agy-sandbox"
+elif command -v agy-sandbox.exe &> /dev/null; then
+    AGY_CMD="agy-sandbox.exe"
+else
+    echo "Error: agy-sandbox command not found." >&2
+    echo "Please install it with: pip install agy-sandbox" >&2
+    exit 1
+fi
+
+# Map old arguments to new CLI format
+# Original: manage-agy.sh <project-dir> [studio|vertex]
+# New: agy-sandbox provision <project-dir> --provider <studio|vertex>
+
+PROJECT_DIR="${1:-.}"
+PROVIDER="${2:-studio}"
+
+# Validate provider
+if [[ "$PROVIDER" != "studio" && "$PROVIDER" != "vertex" ]]; then
+    echo "Error: Invalid provider '$PROVIDER'. Use 'studio' or 'vertex'." >&2
+    echo "Usage: $0 /path/to/project [studio|vertex]" >&2
+    exit 1
+fi
+
+# Run the Python CLI
+exec $AGY_CMD provision "$PROJECT_DIR" --provider "$PROVIDER" "$@"
