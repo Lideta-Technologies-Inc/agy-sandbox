@@ -132,6 +132,14 @@ class SandboxEngine:
         except DockerError:
             return "absent"
 
+    def _buildx_available(self) -> bool:
+        """Check if docker buildx is available and working."""
+        try:
+            result = self._docker(["buildx", "version"], capture=True, check=False)
+            return result.returncode == 0
+        except DockerError:
+            return False
+
     def build_image(self) -> None:
         """Build the Docker image for the sandbox."""
         dockerfile = self.script_dir / "Dockerfile_permissive"
@@ -140,18 +148,34 @@ class SandboxEngine:
 
         print(f"Building base Docker image '{self.config.image_name}'...")
 
-        # Use buildx directly — buildx requires --build-arg AFTER the 'build' subcommand
-        build_args = [
-            "buildx", "build",
+        build_args_base = [
             f"--build-arg=USER_UID={self.config.host_uid}",
             f"--build-arg=USER_GID={self.config.host_gid}",
             "-f", str(dockerfile),
             "-t", self.config.image_name,
-            "--load",
             str(self.script_dir)
         ]
 
-        self._docker(build_args)
+        # Try buildx first, fall back to plain docker build
+        if self._buildx_available():
+            build_cmd = ["buildx", "build", "--load"] + build_args_base
+        else:
+            build_cmd = ["build"] + build_args_base
+
+        try:
+            self._docker(build_cmd, check=True)
+        except DockerError:
+            # If the primary method fails, try the fallback
+            if self._buildx_available():
+                # buildx failed, try plain build
+                try:
+                    self._docker(["build"] + build_args_base, check=True)
+                    print(f"✔ Image '{self.config.image_name}' built successfully.")
+                    return
+                except DockerError:
+                    pass
+            raise
+
         print(f"✔ Image '{self.config.image_name}' built successfully.")
 
     def get_provider_args(self) -> List[str]:
