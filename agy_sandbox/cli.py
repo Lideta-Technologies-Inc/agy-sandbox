@@ -5,6 +5,7 @@ from pathlib import Path
 
 import click
 
+from . import __version__
 from .config import SandboxConfig, Provider
 from .engine import SandboxEngine, DockerError
 
@@ -61,7 +62,7 @@ class AliasedGroup(click.Group):
 
 
 @click.group(cls=AliasedGroup)
-@click.version_option(version="0.1.0", prog_name="agy-sandbox")
+@click.version_option(version=__version__, prog_name="agy-sandbox")
 @click.pass_context
 def main(ctx):
     """agy-sandbox: Secure, isolated development environments with Antigravity AI.

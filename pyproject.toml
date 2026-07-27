@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agy-sandbox"
-version = "0.1.1"
+version = "0.1.2"
 description = "Secure, isolated development environments powered by Docker and the Antigravity AI agent"
 readme = "README.md"
 license = {text = "MIT"}
