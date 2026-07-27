@@ -1,3 +1,5 @@
 """agy-sandbox: Secure, isolated development environments powered by Docker and Antigravity AI agent."""
 
-__version__ = "0.1.0"
+import importlib.metadata
+
+__version__ = importlib.metadata.version("agy-sandbox")
